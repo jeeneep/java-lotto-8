@@ -3,15 +3,14 @@ package lotto.controller;
 import lotto.constant.ErrorMessage;
 import lotto.constant.LottoConstant;
 import lotto.domain.Lotto;
-import lotto.domain.Rank;
 import lotto.domain.WinningLotto;
 import lotto.service.LottoService;
 import lotto.view.InputView;
 import lotto.view.OutputView;
+import lotto.domain.LottoResults;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 public class LottoController {
 
@@ -35,8 +34,9 @@ public class LottoController {
             WinningLotto winningLotto = readValidWinningLotto();
 
             // 결과 계산 및 출력
-            Map<Rank, Integer> results = lottoService.calculateResults(purchasedLottos, winningLotto);
+            LottoResults results = lottoService.calculateResults(purchasedLottos, winningLotto);
             printResults(results, purchaseAmount);
+
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -135,9 +135,9 @@ public class LottoController {
 
     // --- 결과 출력 ---
 
-    private void printResults(Map<Rank, Integer> results, int purchaseAmount) {
+    private void printResults(LottoResults results, int purchaseAmount) {
         outputView.printLottoResult(results);
-        String rateOfReturn = lottoService.calculateRateOfReturn(results, purchaseAmount);
+        String rateOfReturn = results.calculateRateOfReturn(purchaseAmount); // LottoResults에 위임
         outputView.printRateOfReturn(rateOfReturn);
     }
 }

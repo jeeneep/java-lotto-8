@@ -3,6 +3,7 @@ package lotto.service;
 import lotto.constant.LottoConstant;
 import lotto.domain.Lotto;
 import lotto.domain.LottoMachine;
+import lotto.domain.LottoResults;
 import lotto.domain.Rank;
 import lotto.domain.WinningLotto;
 
@@ -38,16 +39,16 @@ public class LottoService {
 
     // --- 통계 및 수익률 계산 ---
 
-    // 당첨 통계 계산
-    public Map<Rank, Integer> calculateResults(List<Lotto> purchasedLottos, WinningLotto winningLotto) {
-        Map<Rank, Integer> results = initializeResultsMap();
+    // 당첨 통계 집계하여 LottoResults 객체를 반환
+    public LottoResults calculateResults(List<Lotto> purchasedLottos, WinningLotto winningLotto) {
+        Map<Rank, Integer> resultsMap = initializeResultsMap();
 
         purchasedLottos.stream()
                 .map(winningLotto::match)
                 .filter(rank -> rank != Rank.MISS)
-                .forEach(rank -> results.put(rank, results.get(rank) + 1));
+                .forEach(rank -> resultsMap.put(rank, resultsMap.get(rank) + 1));
 
-        return results;
+        return new LottoResults(resultsMap);
     }
 
     // 통계 맵 초기화
@@ -60,18 +61,4 @@ public class LottoService {
                 ));
     }
 
-    // 수익률 계산
-    public String calculateRateOfReturn(Map<Rank, Integer> results, int purchaseAmount) {
-        long totalPrize = calculateTotalPrize(results);
-        double rate = (double) totalPrize / purchaseAmount * 100;
-
-        return String.format("%." + LottoConstant.ROUNDING_SCALE + "f", rate);
-    }
-
-    // 총 상금 계산
-    private long calculateTotalPrize(Map<Rank, Integer> results) {
-        return results.entrySet().stream()
-                .mapToLong(entry -> entry.getKey().getPrizeMoney() * entry.getValue())
-                .sum();
-    }
 }
