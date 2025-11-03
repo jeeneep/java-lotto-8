@@ -18,7 +18,7 @@ public class LottoResults {
     }
 
     // 총 상금 계산
-    private long calculateTotalPrize() {
+    public long calculateTotalPrize() {
         return results.entrySet().stream()
                 .mapToLong(entry -> entry.getKey().getPrizeMoney() * entry.getValue())
                 .sum();
